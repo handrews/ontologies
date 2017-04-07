@@ -11,13 +11,15 @@ DataProperty: hasCommonName
     Range: xsd:string
     Characteristics: Functional
 
+Class: PublishingCompany
+
 DataProperty: beganBusiness
-    Domain: Publisher
+    Domain: Publisher or PublishingCompany
     Range: xsd:dateTime
     Characteristics: Functional
 
 DataProperty: endedBusiness
-    Domain: Publisher
+    Domain: Publisher or PublishingCompany
     Range: xsd:dateTime
     Characteristics: Functional
 
@@ -25,10 +27,11 @@ DataProperty: endedBusiness
 Class: Series
     HasKey: isPublishedBy, hasSeriesName, hasFirstIssue
 
+ObjectProperty: hasIssue
+    InverseOf: belongsToSeries
+
 ObjectProperty: isPublishedBy
-    Domain: Series
-    Range: Publisher
-    Characteristics: Functional
+    SubPropertyChain: hasIssue o isPublishedBy
 
 ObjectProperty: hasFirstIssue
     Domain: Series
@@ -42,9 +45,11 @@ ObjectProperty: hasLastIssue
 
 ObjectProperty: hasStartDate
     SubPropertyChain: hasFirstIssue o hasPublicationDate
+    Characteristics: Functional
 
 ObjectProperty: hasEndDate
     SubPropertyChain: hasLastIssue o hasPublicationDate
+    Characteristics: Functional
 
 DataProperty: hasSeriesName
     Domain: Series
@@ -64,9 +69,18 @@ DataProperty: hasSortableDate
     Range: xsd:dateTime
     Characteristics: Functional
 
+DataProperty: hasOnSaleDate
+    Domain: PublicationDate
+    Range: xsd:dateTime
+    Characteristics: Functional
+
 
 Class: Issue
     HasKey: belongsToSeries, hasSortPosition
+
+ObjectProperty: isPublishedBy
+    Domain: Issue
+    Range: PublishingCompany
 
 ObjectProperty: belongsToSeries
     Domain: Issue
@@ -111,6 +125,10 @@ DataProperty: hasFirstLineOfDialog
     Range: xsd:string
     Characteristics: Functional
 
+DataProperty: hasInventoryIdentifier
+    Domain: Story
+    Range: xsd:string
+
 
 DataProperty: hasPageCount
     Domain: Issue or Story
@@ -118,33 +136,116 @@ DataProperty: hasPageCount
     Characteristics: Functional
 
 
+Class: Credit
+
+ObjectProperty: hasCredit
+    Domain: Story or Issue
+    Range: Credit
+    Characteristics: InverseFunctional
+
+
 Class: Person
 
-ObjectProperty: hasCreditedPerson
-    Domain: Story or Issue
+DataProperty: hasCreditedName
+    Domain: Credit
+    Range: xsd:string
+    Characteristics: Functional
+
+DataProperty: creditSourcedFrom
+    Domain: Credit
+    Range: {"signature", "printed credit", "research", "spotting"}
+    Characteristics: Functional
+
+ObjectProperty: creditSpotter
+    Domain: Credit
     Range: Person
 
-ObjectProperty: hasCreator
-    SubPropertyOf: hasCreditedPerson
+DataProperty: creditAppliesTo
+    Domain: Credit
+    Range: xsd:string or xsd:positiveInteger
 
-ObjectProperty: hasWriter
-    SubPropertyOf: hasCreator
+DataProperty: creditAppliesToPages
+    SubPropertyOf: creditAppliesTo
+    Range: xsd:positiveInteger
 
-ObjectProperty: hasArtist
-    SubPropertyOf: hasCreator
-ObjectProperty: hasPenciler
-    SubPropertyOf: hasArtist
-ObjectProperty: hasInker
-    SubPropertyOf: hasArtist
-ObjectProperty: hasColorist
-    SubPropertyOf: hasArtist
-ObjectProperty: hasPainter
-    SubPropertyOf: hasArtist
+DataProperty: creditAppliesToQualifier
+    SubPropertyOf: creditAppliesTo
+    Range: {
+        "backgrounds",
+        "figures",
+        "faces"
+    }
 
-ObjectProperty: hasLetterer
-    SubPropertyOf: hasCreator
+ObjectProperty: hasCreditedPerson
+    Domain: Credit
+    Range: Person
+    Characteristics: Functional
 
-ObjectProperty: hasEditor
-    SubPropertyOf: hasCreditedPerson
+DataProperty: hasCreditedRole
+    Domain: Credit
+    Range: xsd:string
 
-DisjointClasses: Publisher, Series, Issue, Story, Person, PublicationDate
+DataProperty: hasCreativeRole
+    SubPropertyOf: hasCreditedRole
+
+DataProperty: hasWritingRole
+    SubPropertyOf: hasCreativeRole
+    Domain: Credit
+    Range: {
+        "writer",
+        "plotter",
+        "scripter",
+        "plot assist"
+    }
+
+DataProperty: hasArtistRole
+    SubPropertyOf: hasCreativeRole
+    Domain: Credit
+    Range: {
+        "penciler",
+        "inker",
+        "painter",
+        "colorist",
+        "separations",
+        "blackspotting",
+        "layouts",
+        "finishing pencils",
+        "finishes",
+        "computer art"
+    }
+
+DataProperty: hasLetteringRole
+    SubPropertyOf: hasCreativeRole
+    Domain: Credit
+    Range: {
+        "letterer",
+        "logo designer",
+        "typeface designer"
+    }
+
+DataProperty: hasEditorialRole
+    SubPropertyOf: hasCreditedRole
+    Domain: Credit
+    Range: {
+        "editor",
+        "assistant editor",
+        "associate editor",
+        "managing editor",
+        "editor in chief"
+    }
+
+DataProperty: hasBusinessRole
+    SubPropertyOf: hasCreditedRole
+    Domain: Credit
+    Range: {
+        "owner",
+        "business manager",
+        "publisher",
+        "producer",
+        "executive producer",
+        "notary public"
+    }
+
+DisjointClasses:
+    Publisher, PublishingCompany, Series, Issue, Story,
+    Person, PublicationDate, Credit
