@@ -1,0 +1,150 @@
+Prefix: : <http://comics.org/owl/gcd/>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: owl: <http://www.w3.org/2002/07/owl#>
+Ontology: <http://comics.org/owl/gcd>
+
+Class: Publisher
+    HasKey: hasCommonName, beganBusiness
+
+DataProperty: hasCommonName
+    Domain: Publisher
+    Range: xsd:string
+    Characteristics: Functional
+
+DataProperty: beganBusiness
+    Domain: Publisher
+    Range: xsd:dateTime
+    Characteristics: Functional
+
+DataProperty: endedBusiness
+    Domain: Publisher
+    Range: xsd:dateTime
+    Characteristics: Functional
+
+
+Class: Series
+    HasKey: isPublishedBy, hasSeriesName, hasFirstIssue
+
+ObjectProperty: isPublishedBy
+    Domain: Series
+    Range: Publisher
+    Characteristics: Functional
+
+ObjectProperty: hasFirstIssue
+    Domain: Series
+    Range: Issue
+    Characteristics: Functional
+
+ObjectProperty: hasLastIssue
+    Domain: Series
+    Range: Issue
+    Characteristics: Functional
+
+ObjectProperty: hasStartDate
+    SubPropertyChain: hasFirstIssue o hasPublicationDate
+
+ObjectProperty: hasEndDate
+    SubPropertyChain: hasLastIssue o hasPublicationDate
+
+DataProperty: hasSeriesName
+    Domain: Series
+    Range: xsd:string
+    Characteristics: Functional
+
+
+Class: PublicationDate
+
+DataProperty: hasDisplayDate
+    Domain: PublicationDate
+    Range: xsd:string
+    Characteristics: Functional
+
+DataProperty: hasSortableDate
+    Domain: PublicationDate
+    Range: xsd:dateTime
+    Characteristics: Functional
+
+
+Class: Issue
+    HasKey: belongsToSeries, hasSortPosition
+
+ObjectProperty: belongsToSeries
+    Domain: Issue
+    Range: Series
+    Characteristics: Functional
+
+DataProperty: hasVolumeIdentifier
+    Domain: Issue
+    Range: xsd:string
+    Characteristics: Functional
+
+DataProperty: hasIssueIdentifier
+    Domain: Issue
+    Range: xsd:string
+    Characteristics: Functional
+
+ObjectProperty: hasPublicationDate
+    Domain: Issue
+    Range: PublicationDate
+    Characteristics: Functional
+
+DataProperty: hasSortPosition
+    Domain: Issue
+    Range: xsd:nonNegativeInteger
+    Characteristics: Functional
+
+
+Class: Story
+
+ObjectProperty: isPublishedIn
+    Domain: Story
+    Range: Issue
+    Characteristics: Functional
+
+DataProperty: hasTitle
+    Domain: Story
+    Range: xsd:string
+    Characteristics: Functional
+
+DataProperty: hasFirstLineOfDialog
+    Domain: Story
+    Range: xsd:string
+    Characteristics: Functional
+
+
+DataProperty: hasPageCount
+    Domain: Issue or Story
+    Range: xsd:decimal[> 0.0]
+    Characteristics: Functional
+
+
+Class: Person
+
+ObjectProperty: hasCreditedPerson
+    Domain: Story or Issue
+    Range: Person
+
+ObjectProperty: hasCreator
+    SubPropertyOf: hasCreditedPerson
+
+ObjectProperty: hasWriter
+    SubPropertyOf: hasCreator
+
+ObjectProperty: hasArtist
+    SubPropertyOf: hasCreator
+ObjectProperty: hasPenciler
+    SubPropertyOf: hasArtist
+ObjectProperty: hasInker
+    SubPropertyOf: hasArtist
+ObjectProperty: hasColorist
+    SubPropertyOf: hasArtist
+ObjectProperty: hasPainter
+    SubPropertyOf: hasArtist
+
+ObjectProperty: hasLetterer
+    SubPropertyOf: hasCreator
+
+ObjectProperty: hasEditor
+    SubPropertyOf: hasCreditedPerson
+
+DisjointClasses: Publisher, Series, Issue, Story, Person, PublicationDate
