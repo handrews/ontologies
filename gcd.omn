@@ -1,26 +1,78 @@
-Prefix: : <http://comics.org/owl/gcd/>
+Prefix: : <http://comics.org/owl/gcd#>
 Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
 Prefix: owl: <http://www.w3.org/2002/07/owl#>
-Ontology: <http://comics.org/owl/gcd>
+Ontology: <http://comics.org/owl/gcd#>
+
+Class: FlexibleDate
+
+DataProperty: hasYear
+    Domain: FlexibleDate
+    Range: xsd:positiveInteger
+
+DataProperty: yearUncertain
+    Domain: FlexibleDate
+    Range: xsd:boolean
+
+DataProperty: hasMonth
+    Domain: FlexibleDate
+    Range: xsd:positiveInteger[<= 12]
+
+DataProperty: monthUncertain
+    Domain: FlexibleDate
+    Range: xsd:boolean
+
+DataProperty: hasDay
+    Domain: FlexibleDate
+    Range: xsd:positiveInteger[<= 31]
+
+DataProperty: dayUncertain
+    Domain: FlexibleDate
+    Range: xsd:boolean
+
+
+Class: FlexibleDateRange
+
+ObjectProperty: startDate
+    Domain: FlexibleDateRange
+    Range: FlexibleDate
+    Characteristics: Functional
+
+ObjectProperty: endDate
+    Domain: FlexibleDateRange
+    Range: FlexibleDate
+    Characteristics: Functional
+
+
+Class: TenuredEntity
+
+ObjectProperty: activeDuring
+    Domain: TenuredEntity
+    Range: FlexibleDateRange
+
 
 Class: Publisher
-    HasKey: hasCommonName, beganBusiness
+    SubClassOf: TenuredEntity
+    HasKey: hasCommonName
 
 DataProperty: hasCommonName
     Domain: Publisher
     Range: xsd:string
     Characteristics: Functional
 
+
+Class: Company
+    SubClassOf: TenuredEntity
+
 Class: PublishingCompany
+    SubClassOf: Company
 
-DataProperty: beganBusiness
-    Domain: Publisher or PublishingCompany
-    Range: xsd:dateTime
-    Characteristics: Functional
+ObjectProperty: groupedUnder
+    Domain: PublishingCompany
+    Range: Publisher
 
-DataProperty: endedBusiness
-    Domain: Publisher or PublishingCompany
-    Range: xsd:dateTime
+DataProperty: hasCompanyName
+    Domain: Company
+    Range: xsd:string
     Characteristics: Functional
 
 
@@ -28,6 +80,8 @@ Class: Series
     HasKey: isPublishedBy, hasSeriesName, hasFirstIssue
 
 ObjectProperty: hasIssue
+    Domain: Series
+    Range: Issue
     InverseOf: belongsToSeries
 
 ObjectProperty: isPublishedBy
@@ -75,7 +129,11 @@ DataProperty: hasOnSaleDate
     Characteristics: Functional
 
 
+Class: PublishingUnit
+
+
 Class: Issue
+    SubClassOf: PublishingUnit
     HasKey: belongsToSeries, hasSortPosition
 
 ObjectProperty: isPublishedBy
@@ -85,7 +143,6 @@ ObjectProperty: isPublishedBy
 ObjectProperty: belongsToSeries
     Domain: Issue
     Range: Series
-    Characteristics: Functional
 
 DataProperty: hasVolumeIdentifier
     Domain: Issue
@@ -109,6 +166,7 @@ DataProperty: hasSortPosition
 
 
 Class: Story
+    SubClassOf: PublishingUnit
 
 ObjectProperty: isPublishedIn
     Domain: Story
@@ -131,7 +189,7 @@ DataProperty: hasInventoryIdentifier
 
 
 DataProperty: hasPageCount
-    Domain: Issue or Story
+    Domain: PublishingUnit
     Range: xsd:decimal[> 0.0]
     Characteristics: Functional
 
@@ -139,7 +197,7 @@ DataProperty: hasPageCount
 Class: Credit
 
 ObjectProperty: hasCredit
-    Domain: Story or Issue
+    Domain: PublishingUnit
     Range: Credit
     Characteristics: InverseFunctional
 
@@ -160,6 +218,14 @@ ObjectProperty: creditSpotter
     Domain: Credit
     Range: Person
 
+
+DataType: CreditQualifier
+    EquivalentTo: {
+        "backgrounds",
+        "figures",
+        "faces"
+    }
+
 DataProperty: creditAppliesTo
     Domain: Credit
     Range: xsd:string or xsd:positiveInteger
@@ -170,10 +236,55 @@ DataProperty: creditAppliesToPages
 
 DataProperty: creditAppliesToQualifier
     SubPropertyOf: creditAppliesTo
-    Range: {
-        "backgrounds",
-        "figures",
-        "faces"
+    Range: CreditQualifier
+
+
+DataType: WritingRole
+    EquivalentTo: {
+        "writer",
+        "plotter",
+        "scripter",
+        "plot assist"
+    }
+
+DataType: ArtisticRole
+    EquivalentTo: {
+        "penciler",
+        "inker",
+        "painter",
+        "colorist",
+        "separations",
+        "blackspotting",
+        "layouts",
+        "finishing pencils",
+        "finishes",
+        "computer art"
+    }
+
+DataType: LetteringRole
+    EquivalentTo: {
+        "letterer",
+        "logo designer",
+        "typeface designer"
+    }
+
+DataType: EditorialRole
+    EquivalentTo: {
+        "editor",
+        "assistant editor",
+        "associate editor",
+        "managing editor",
+        "editor in chief"
+    }
+
+DataType: BusinessRole
+    EquivalentTo: {
+        "owner",
+        "business manager",
+        "publisher",
+        "producer",
+        "executive producer",
+        "notary public"
     }
 
 ObjectProperty: hasCreditedPerson
@@ -191,60 +302,27 @@ DataProperty: hasCreativeRole
 DataProperty: hasWritingRole
     SubPropertyOf: hasCreativeRole
     Domain: Credit
-    Range: {
-        "writer",
-        "plotter",
-        "scripter",
-        "plot assist"
-    }
+    Range: WritingRole
 
 DataProperty: hasArtistRole
     SubPropertyOf: hasCreativeRole
     Domain: Credit
-    Range: {
-        "penciler",
-        "inker",
-        "painter",
-        "colorist",
-        "separations",
-        "blackspotting",
-        "layouts",
-        "finishing pencils",
-        "finishes",
-        "computer art"
-    }
+    Range: ArtisticRole
 
 DataProperty: hasLetteringRole
     SubPropertyOf: hasCreativeRole
     Domain: Credit
-    Range: {
-        "letterer",
-        "logo designer",
-        "typeface designer"
-    }
+    Range: LetteringRole
 
 DataProperty: hasEditorialRole
     SubPropertyOf: hasCreditedRole
     Domain: Credit
-    Range: {
-        "editor",
-        "assistant editor",
-        "associate editor",
-        "managing editor",
-        "editor in chief"
-    }
+    Range: EditorialRole
 
 DataProperty: hasBusinessRole
     SubPropertyOf: hasCreditedRole
     Domain: Credit
-    Range: {
-        "owner",
-        "business manager",
-        "publisher",
-        "producer",
-        "executive producer",
-        "notary public"
-    }
+    Range: BusinessRole
 
 DisjointClasses:
     Publisher, PublishingCompany, Series, Issue, Story,

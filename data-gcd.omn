@@ -1,0 +1,58 @@
+Prefix: : <http://comics.org/owl/gcd/>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+Prefix: owl: <http://www.w3.org/2002/07/owl#>
+Import: <http://comics.org/owl/gcd>
+Ontology: <http://comics.org/owl/gcd/data>
+
+Individual: Marvel
+    Types: Publisher
+    Facts: hasCommonName "Marvel"
+
+Individual: MarvelDateRange
+    Types: DateRange
+
+Individual: TimelyPublications
+    Types: PublishingCompany
+    Facts: hasCompanyName "Timely Publications"
+    Facts: groupedUnder Marvel
+
+Individual: TimelyComicsInc
+    Types: PublishingCompany
+    Facts: hasCompanyName "Timely Comics, Inc."
+
+Individual: MarvelMysteryComics1939
+    Types: Series
+    Facts: hasSeriesName "Marvel Mystery Comics"
+    Facts: hasFirstIssue MarvelMysteryComics1939_1
+    Facts: hasLastIssue MarvelMysteryComics1939_1
+
+Individual: MarvelMysterComics1939_1
+    Types: Issue
+    Facts: isPublishedBy TimelyPublications
+    Facts: belongsToSeries MarvelMysteryComics1939
+    Facts: hasIssueIdentifier "1"
+    Facts: hasVolumeIdentifier "1"
+
+Individual: DaringMysteryComics1939
+    Types: Series
+    Facts: hasSeriesName "Daring Mystery Comics"
+    Facts: hasFirstIssue DaringMysteryComics1939_1
+    Facts: hasLastIssue DaringMysteryComics1939_8
+
+Individual: DaringMysterComics1939_1
+    Types: Issue
+    Facts: isPublishedBy TimelyPublications
+    Facts: belongsToSeries DaringMysteryComics1939
+    Facts: hasIssueIdentifier "1"
+    Facts: hasVolumeIdentifier "1"
+
+Individual: DaringMysterComics1939_2
+    Types: Issue
+    Facts: isPublishedBy TimelyPublications
+    Facts: belongsToSeries DaringMysteryComics1939
+    Facts: hasIssueIdentifier "2"
+    Facts: hasVolumeIdentifier "1"
+
+Individual: MysticComics1940
+    Types: Series
+    Facts: hasSeriesName "Mystic Comics"
