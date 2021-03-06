@@ -5,11 +5,17 @@ info:
     description: >
         HTTP API for Gather Town that is so RPC-ish for no good reason that
         it hurts my soul.  RESTful HTTP _or_ use an RPC system, dammit!
+tags:
+  - {name: space}
+  - {name: map}
+  - {name: guestlist}
 servers:
   - url: https://gather.town/api
 paths:
     /createRoom:
         post:
+            operationId: createSpace
+            tags: [space]
             summary: "Creates a space (NOT a room)"
             requestBody:
                 content:
@@ -25,6 +31,8 @@ paths:
                                 $ref: "#/components/schemas/spaceId"
     /getMap:
         get:
+            operationId: getMap
+            tags: [map]
             summary: "Retrieves the map for a single room"
             parameters:
               - $ref: "#/components/parameters/apiKey"
@@ -39,6 +47,8 @@ paths:
                                 $ref: "#/components/schemas/map"
     /setMap:
         post:
+            operationId: setMap
+            tags: [map]
             summary: "Overwrites the map for a single room"
             requestBody:
                 content:
@@ -50,6 +60,8 @@ paths:
                     description: "OK"
     /getEmailGuestlist:
         get:
+            operationId: getEmailGuestlist
+            tags: [guestlist]
             summary: "Retrieves the set of guests for a space"
             parameters:
               - $ref: "#/components/parameters/apiKey"
@@ -63,6 +75,8 @@ paths:
                                 $ref: "#/components/schemas/guestlist"
     /setEmailGuestlist:
         post:
+            operationId: setEmailGuestlist
+            tags: [guestlist]
             summary: "Appends to or ovewrites the set of guests for a space"
             requestBody:
                 content:
@@ -97,6 +111,7 @@ components:
             type: string
         spaceFromSource:
             type: object
+            required: [apiKey, name]
             properties:
                 apiKey:
                     $ref: "#/components/schemas/apiKey"
@@ -115,6 +130,7 @@ components:
                       - $ref: "#/components/schemas/mapId"
         map:
             type: object
+            required: [id, version, dimensions, spaces, portals, objects, assets, spawns, announcer, foregroundImagePath, backgroundImagePath, useDrawnBG, collision]
             properties:
                 id:
                     $ref: "#/components/schemas/mapId"
@@ -139,6 +155,7 @@ components:
                     type: array
                     items:
                         type: object
+                        required: [spaceId, x, y, colored]
                         properties:
                             spaceId:
                                 type: integer
@@ -164,6 +181,7 @@ components:
                     type: array
                     items:
                         type: object
+                        required: [x, y]
                         properties:
                             x:
                                 type: integer
@@ -177,6 +195,7 @@ components:
                     type: array
                     items:
                         type: object
+                        required: [x, y]
                         properties:
                             x:
                                 type: integer
@@ -187,6 +206,7 @@ components:
                     type: string
         portal:
             type: object
+            required: [x, y, targetMap, targetX, targetY]
             properties:
                 x:
                     type: integer
@@ -200,6 +220,7 @@ components:
                     type: integer
         object:
             type: object
+            required: [type, properties, height, width, x, y, normal]
             properties:
                 type:
                     type: integer
