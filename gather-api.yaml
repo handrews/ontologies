@@ -1,24 +1,28 @@
 openapi: "3.0"
 info:
     title: Gather Town API
-    version: 0.1
+    version: "0.0.1"
     description: >
         HTTP API for Gather Town that is so RPC-ish for no good reason that
         it hurts my soul.  RESTful HTTP _or_ use an RPC system, dammit!
 servers:
-    url: https://gather.town/api
+  - url: https://gather.town/api
 paths:
     /createRoom:
         post:
             summary: "Creates a space (NOT a room)"
-            request:
-                schema:
-                    $ref: "#/components/schemas/spaceFromSource"
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/spaceFromSource"
             responses:
                 "200":
-                    text/plain:
-                        schema:
-                            $ref: "#/components/schemas/spaceId"
+                    description: "OK"
+                    content:
+                        text/plain:
+                            schema:
+                                $ref: "#/components/schemas/spaceId"
     /getMap:
         get:
             summary: "Retrieves the map for a single room"
@@ -28,14 +32,22 @@ paths:
               - $ref: "#/components/parameters/mapId"
             responses:
                 "200":
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/map"
+                    description: "OK"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/map"
     /setMap:
         post:
             summary: "Overwrites the map for a single room"
-            request:
-                $ref: "#/components/schemas/map"
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/map"
+            responses:
+                "200":
+                    description: "OK"
     /getEmailGuestlist:
         get:
             summary: "Retrieves the set of guests for a space"
@@ -44,25 +56,32 @@ paths:
               - $ref: "#/components/parameters/spaceId"
             responses:
                 "200":
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/guestlist"
+                    description: "OK"
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/guestlist"
     /setEmailGuestlist:
         post:
             summary: "Appends to or ovewrites the set of guests for a space"
-        request:
-            schema:
-                type: object
-                properties:
-                    apiKey:
-                        $ref: "#/components/schemas/apiKey"
-                    spaceId:
-                        $ref: "#/components/schemas/spaceId"
-                    guestlist:
-                        $ref: "#/components/schemas/guestlist"
-                    overwrite:
-                        type: boolean
-                        default: false
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                apiKey:
+                                    $ref: "#/components/schemas/apiKey"
+                                spaceId:
+                                    $ref: "#/components/schemas/spaceId"
+                                guestlist:
+                                    $ref: "#/components/schemas/guestlist"
+                                overwrite:
+                                    type: boolean
+                                    default: false
+            responses:
+                "200":
+                    description: "OK"
 components:
     schemas:
         apiKey:
