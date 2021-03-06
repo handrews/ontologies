@@ -1,0 +1,272 @@
+openapi: "3.0"
+info:
+    title: Gather Town API
+    version: 0.1
+    description: >
+        HTTP API for Gather Town that is so RPC-ish for no good reason that
+        it hurts my soul.  RESTful HTTP _or_ use an RPC system, dammit!
+servers:
+    url: https://gather.town/api
+paths:
+    /createRoom:
+        post:
+            summary: "Creates a space (NOT a room)"
+            request:
+                schema:
+                    $ref: "#/components/schemas/spaceFromSource"
+            responses:
+                "200":
+                    text/plain:
+                        schema:
+                            $ref: "#/components/schemas/spaceId"
+    /getMap:
+        get:
+            summary: "Retrieves the map for a single room"
+            parameters:
+              - $ref: "#/components/parameters/apiKey"
+              - $ref: "#/components/parameters/spaceId"
+              - $ref: "#/components/parameters/mapId"
+            responses:
+                "200":
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/map"
+    /setMap:
+        post:
+            summary: "Overwrites the map for a single room"
+            request:
+                $ref: "#/components/schemas/map"
+    /getEmailGuestlist:
+        get:
+            summary: "Retrieves the set of guests for a space"
+            parameters:
+              - $ref: "#/components/parameters/apiKey"
+              - $ref: "#/components/parameters/spaceId"
+            responses:
+                "200":
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/guestlist"
+    /setEmailGuestlist:
+        post:
+            summary: "Appends to or ovewrites the set of guests for a space"
+        request:
+            schema:
+                type: object
+                properties:
+                    apiKey:
+                        $ref: "#/components/schemas/apiKey"
+                    spaceId:
+                        $ref: "#/components/schemas/spaceId"
+                    guestlist:
+                        $ref: "#/components/schemas/guestlist"
+                    overwrite:
+                        type: boolean
+                        default: false
+components:
+    schemas:
+        apiKey:
+            type: string
+            pattern: "^[a-zA-Z0-9]{16}$"
+        spaceId:
+            description: >
+                The space identifier, with a backslash in place of a slash
+                because I guess no one understood url query parameter encoding?
+            type: string
+            pattern: "^[a-zA-Z0-9]{16}\\\\[-a-zA-Z0-9_]+$"
+        mapId:
+            type: string
+        spaceFromSource:
+            type: object
+            properties:
+                apiKey:
+                    $ref: "#/components/schemas/apiKey"
+                name:
+                    title: "The name (portion after the slash) of the new space."
+                    type: string
+                    pattern: "^[-a-zA-Z0-9_]+$"
+                sourceSpace:
+                    allOf:
+                      - title: "ID of the source space from which to copy maps"
+                      - $ref: "#/components/schemas/spaceId"
+                map:
+                    allOf:
+                      - title: "ID of the starting map of the new space"
+                        deprecated: true
+                      - $ref: "#/components/schemas/mapId"
+        map:
+            type: object
+            properties:
+                id:
+                    $ref: "#/components/schemas/mapId"
+                version:
+                    type: string
+                    pattern: "^v\\d+\\.\\d+\\.\\d+$"
+                foregroundImagePath:
+                    type: string
+                    format: uri
+                backgroundImagePath:
+                    type: string
+                    format: uri
+                useDrawnBG:
+                    type: boolean
+                dimensions:
+                    description: An [x, y] tuple
+                    items:
+                        type: integer
+                    minItems: 2
+                    maxItems: 2
+                spaces:
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            spaceId:
+                                type: integer
+                            x:
+                                type: integer
+                            y:
+                                type: integer
+                            colored:
+                                type: boolean
+                portals:
+                    title: List of outbound door tiles
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/portal"
+                objects:
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/object"
+                objectSizes:
+                    type: integer
+                announcer:
+                    title: "List of announcer tiles"
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            x:
+                                type: integer
+                            y:
+                                type: integer
+                assets:
+                    type: array
+                    items: {}
+                spawns:
+                    title: List of tiles where guests appear
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            x:
+                                type: integer
+                            y:
+                                type: integer
+                collisions:
+                    description: WT actual F?
+                    type: string
+        portal:
+            type: object
+            properties:
+                x:
+                    type: integer
+                y:
+                    type: integer
+                targetMap:
+                    $ref: "#/components/schemas/mapId"
+                targetX:
+                    type: integer
+                targetY:
+                    type: integer
+        object:
+            type: object
+            properties:
+                type:
+                    type: integer
+                    enum: [0, 1]
+                properties:
+                    $ref: "#/components/schemas/propertiesObject"
+                height:
+                    type: integer
+                width:
+                    type: integer
+                scale:
+                    type: integer
+                x:
+                    type: integer
+                y:
+                    type: integer
+                offsetX:
+                    description: >
+                        ?? Amount by which to offset the images in the
+                        horizontal direction??
+                    type: number
+                offsetY:
+                    description: >
+                        ?? Amount by which to offset the images in the
+                        vertical direction??
+                    type: number
+                normal:
+                    title: "Normal (non-highlighted) image URI"
+                    type: string
+                    format: uri
+                highlighted:
+                    title: "Highlighted image URI"
+                    type: string
+                    format: uri
+                distThreshold:
+                    type: integer
+                previewMessage:
+                    title: "Preview Message"
+                    description: >
+                        The message displayed when inside the threshold
+                _name:
+                    description: >
+                        ?? Some sort of name for the object, only present
+                        far "Battle Tetris" so far ??  Extension field??
+        propertiesObject:
+            type: object
+            properties:
+                url:
+                    type: string
+                    format: uri
+                loading:
+                    type: string
+                    format: uri
+                deterministicUrlPrefix:
+                    type: string
+                    format: uri
+        guestlist:
+            type: object
+            x-propertyNames:
+                type: string
+                format: email
+            additionalProperties:
+                type: object
+                properties:
+                    name:
+                        type: string
+                    affiliation:
+                        type: string
+                    role:
+                        type: string
+    parameters:
+        apiKey:
+            name: apiKey
+            in: query
+            required: true
+            schema:
+                type: string
+        spaceId:
+            name: spaceId
+            in: query
+            required: true
+            schema:
+                type: string
+        mapId:
+            name: mapId
+            in: query
+            required: true
+            schema:
+                type: string
